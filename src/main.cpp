@@ -14,6 +14,10 @@ const char* password = "";
 const String firebase_host = "https://test-acc41-default-rtdb.firebaseio.com/";
 const String firebase_path = "esp32_data.json"; // will post to .../esp32_data.json
 
+// ---------- Kafka Gateway API ----------
+const String kafka_api_url = "http://192.168.29.220:8000/sensor-data"; // Replace with your actual IP
+
+
 // ---------- Pin Definitions ----------
 #define DHTPIN 18
 #define DHTTYPE DHT22
@@ -85,6 +89,21 @@ void sendDataToFirebase(String jsonData) {
   }
 }
 
+void sendDataToKafka(String jsonData) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(kafka_api_url);
+    http.addHeader("Content-Type", "application/json");
+    int httpResponseCode = http.POST(jsonData);
+
+    Serial.print("Kafka Response: ");
+    Serial.println(httpResponseCode);
+    http.end();
+  } else {
+    Serial.println("WiFi not connected (Kafka)");
+  }
+}
+
 long readUltrasonicCM() {
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
@@ -152,6 +171,8 @@ else {
 
   Serial.println(data);
   sendDataToFirebase(data);
+
+  sendDataToKafka(data);
 
   delay(1000); // Update every 5 seconds
 }
