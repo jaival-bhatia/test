@@ -4,19 +4,26 @@ import json
 
 app = FastAPI()
 
-# Connect to Kafka
+# Kafka setup
 producer = KafkaProducer(
     bootstrap_servers='localhost:9092',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
-# ✅ Updated route to match C++ code
 @app.post("/sensor-data")
 async def ingest(request: Request):
-    data = await request.json()
-    print("Received:", data)
+    try:
+        print("🔥 Incoming request...")
+        data = await request.json()
+        print("📥 Received data:", data)
 
-    # Send to Kafka topic
-    producer.send("sensor-data", value=data)
+        # Send to Kafka
+        producer.send("sensor_topic", value=data)
+        producer.flush()
+        print("📤 Sent to Kafka topic: sensor_topic")
 
-    return {"status": "ok"}
+        return {"status": "success", "message": "Data sent to Kafka"}
+
+    except Exception as e:
+        print("❌ Error in FastAPI:", e)
+        return {"status": "error", "message": str(e)}

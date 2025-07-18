@@ -15,7 +15,7 @@ const String firebase_host = "https://test-acc41-default-rtdb.firebaseio.com/";
 const String firebase_path = "esp32_data.json"; // will post to .../esp32_data.json
 
 // ---------- Kafka Gateway API ----------
-const String kafka_api_url = "http://192.168.29.220:8000/sensor-data"; // Replace with your actual IP
+const String kafka_api_url = "http://192.168.29.220:8000/sensor-data";
 
 
 // ---------- Pin Definitions ----------
